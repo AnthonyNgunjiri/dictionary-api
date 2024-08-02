@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Stack, Typography, Box, IconButton } from '@mui/material';
 import {
   ArrowBack as BackIcon,
@@ -6,10 +6,19 @@ import {
   PlayArrow as PlayIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-
+import axios from 'axios'
 const Definition = () => {
   const navigate = useNavigate();
   const { word } = useParams();
+
+ useEffect(()=>{
+  const fetchDefinition= async()=>{
+    const response= await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}
+`)
+console.log(response.data);
+  }
+  fetchDefinition();
+ },[])
 
   return (
     <>
