@@ -1,24 +1,29 @@
-import React, { useEffect } from 'react';
-import { Stack, Typography, Box, IconButton } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Stack, Typography, Box, IconButton, Divider } from '@mui/material';
 import {
   ArrowBack as BackIcon,
   BookmarkBorder as BookmarkIcon,
   PlayArrow as PlayIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios'
+import axios from 'axios';
+
 const Definition = () => {
   const navigate = useNavigate();
   const { word } = useParams();
+  const [definitions, setDefinitions] = useState([]);
 
- useEffect(()=>{
-  const fetchDefinition= async()=>{
-    const response= await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}
-`)
-console.log(response.data);
-  }
-  fetchDefinition();
- },[])
+  useEffect(() => {
+    const fetchDefinition = async () => {
+      try {
+        const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+        setDefinitions(response.data);
+      } catch (error) {
+        console.error('Error fetching the definition:', error);
+      }
+    };
+    fetchDefinition();
+  }, [word]);
 
   return (
     <>
@@ -58,6 +63,31 @@ console.log(response.data);
           <PlayIcon />
         </IconButton>
       </Stack>
+
+      {definitions.length > 0 && definitions.map((def, index) => (
+        <React.Fragment key={index}>
+          <Divider />
+          {def.meanings.map((meaning) => (
+            <Box
+              key={meaning.partOfSpeech}
+              sx={{
+                boxShadow: '0px 10px 25px rgba(0,0,0,0.5)',
+                backgroundColor: '#fff',
+                p: 2,
+                borderRadius: 2,
+                mt: 3,
+              }}
+            >
+              <Typography variant='subtitle1'>{meaning.partOfSpeech}</Typography>
+              {meaning.definitions.map((definition, defIndex) => (
+                <Typography key={defIndex}>
+                  {definitions.length > 1 && `${index + 1}.`} {definition.definition}
+                </Typography>
+              ))}
+            </Box>
+          ))}
+        </React.Fragment>
+      ))}
     </>
   );
 };
